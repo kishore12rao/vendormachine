@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.jio.models.ResponseModel;
 import com.jio.models.VMReport;
-import com.jio.vm.inventory.VMRefilOnly;
 
 @Service
 public class VMServiceImpl implements VMService{
@@ -46,7 +45,7 @@ public class VMServiceImpl implements VMService{
 	}
 
 	@Override
-	public ResponseModel refillOnly(int vmid, VMRefilOnly refil) {
+	public ResponseModel refillOnly(int vmid, VendingMachine refil) {
 		return vmDAO.vmRefill(vmid,refil);
 	}
 

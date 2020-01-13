@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.jio.models.ResponseModel;
 import com.jio.models.VMReport;
-import com.jio.vm.inventory.VMRefilOnly;
 
 public interface VMDAO {
 	
@@ -22,6 +21,6 @@ public interface VMDAO {
 
 	VMReport fetchReportofVM();
 
-	ResponseModel vmRefill(int vmid,VMRefilOnly refil);	
+	ResponseModel vmRefill(int vmid,VendingMachine refil);	
 
 }

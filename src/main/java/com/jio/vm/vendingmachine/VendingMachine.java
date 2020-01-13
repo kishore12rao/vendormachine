@@ -8,10 +8,10 @@ import com.google.gson.annotations.SerializedName;
 public class VendingMachine {
 
 
-	@SerializedName("item_count")
+	@SerializedName("itemcount")
 	@Expose
 	private Integer itemCount;
-	@SerializedName("item_refilled")
+	@SerializedName("itemrefilled")
 	@Expose
 	private Integer itemRefilled;
 	@SerializedName("name")
@@ -23,7 +23,7 @@ public class VendingMachine {
 	@SerializedName("id")
 	@Expose
 	private Integer id;
-	@SerializedName("money_collected")
+	@SerializedName("moneycollected")
 	@Expose
 	private Integer moneyCollected;
 	@SerializedName("createdts")

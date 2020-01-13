@@ -56,7 +56,7 @@ public class VMCtrl {
     @RequestMapping(value="/{vmid}",method = RequestMethod.PUT)
     @ResponseBody
     public ResponseModel update(@PathVariable(value="vmid") final int vmid,@RequestBody VendingMachine vm) {
-        return vmservice.update(vmid,vm);
+    	return vmservice.update(vmid,vm);
     }
     
     @RequestMapping(value="/{vmid}",method = RequestMethod.DELETE)
@@ -64,4 +64,11 @@ public class VMCtrl {
     public ResponseModel delete(@PathVariable(value="vmid") final int vmid) {
 		return vmservice.delete(vmid);
     }
+    
+    @RequestMapping(value="/{vmid}",method = RequestMethod.PATCH)
+	@ResponseBody
+	public ResponseModel refill(@PathVariable(value="vmid") final int vmid,@RequestBody VendingMachine refil) {
+		return vmservice.refillOnly(vmid,refil);
+	}
+    
 }

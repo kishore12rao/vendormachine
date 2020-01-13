@@ -115,17 +115,12 @@ public class Utils {
 					sqlStatement.setObject(i + 1, args.get(i));
 				}
 			}
-			String queryUpperCase = new String(query.toUpperCase());
-System.out.println("UPDATE:: PATCH :: "+sqlStatement);
-			if(queryUpperCase.startsWith("UPDATE")){
-				 rs = sqlStatement.executeUpdate();
-			}else {
-				rs = sqlStatement.executeUpdate();
-			}
-
+			
+			rs = sqlStatement.executeUpdate();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
-			
+
 		} finally {
 			if (customerConn != null) {
 				try {
@@ -141,11 +136,11 @@ System.out.println("UPDATE:: PATCH :: "+sqlStatement);
 		return rs;
 
 	}
-	
-	public static JSONArray insertwithConn(String table, Map<String, Object> values)  {
+
+	public static int insertwithConn(String table, Map<String, Object> values)  {
 		Connection con=null;
-		ResultSet rs=null;
-		JSONArray res= new JSONArray();
+		int rs=-1;
+
 		try {
 			con = DBConnection.getConnection();
 
@@ -173,31 +168,22 @@ System.out.println("UPDATE:: PATCH :: "+sqlStatement);
 						vals.append(" ");
 					}				
 				}
-				System.out.println("vals ::" + vals);
 			}
 			columns.setLength(columns.length() - 1);
 			vals.setLength(vals.length() - 1);
 
 			String q = "INSERT INTO %s (%s) VALUES (%s) ";
-		//	q += "returning id";
+			//	q += "returning id";
 
 			String query = String.format(q, table, columns.toString(), vals.toString());
-			System.out.println("Before writing to DB::" + query);
-			
-			rs = con.createStatement().executeQuery(query);
-			if(rs != null) {
-				res = convertToJSONArray(rs);
-			}
 
-			if (rs != null) rs.close();
+			rs = con.createStatement().executeUpdate(query);
+			
 			if( con != null) con.close();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			try {
-				if (rs != null) rs.close();
 				if( con != null) con.close();
-
-				System.out.println("e.pr");
 				e.printStackTrace();
 			}catch(Exception e1) {
 				e1.printStackTrace();
@@ -205,7 +191,7 @@ System.out.println("UPDATE:: PATCH :: "+sqlStatement);
 		};
 
 
-		return res;
+		return rs;
 	}
 
 }

@@ -14,7 +14,6 @@ import com.google.gson.Gson;
 import com.jio.models.ResponseModel;
 import com.jio.models.VMReport;
 import com.jio.utils.Utils;
-import com.jio.vm.inventory.VMRefilOnly;
 import com.jio.vm.security.AuthenticationDetails;
 import com.jio.vm.users.User;
 import com.jio.vm.users.UserDAO;
@@ -33,14 +32,12 @@ public class VMDAOImpl implements VMDAO{
 	@Override
 	public ArrayList<VendingMachine> getVM() {
 		Authentication auth = authDetails.getAuthentication();
-		System.out.println(" AUTH NAME :: "+auth.getName());
 		User user = userDAO.loadUserByUsername(auth.getName());
-		System.out.println("USER REQ: "+user.toJSON());
-		
+
 		if(!user.getRole().contains("admin")) {
 			return null;
 		}
-		
+
 
 		String sql = "select * from vending_machine where status = ? ";
 
@@ -50,7 +47,6 @@ public class VMDAOImpl implements VMDAO{
 
 
 		JSONArray rs = Utils.executeQueryWithConn(sql, arg);
-		System.out.println(rs);
 		if(rs.length() > 0) {
 			for(int i=0;i<rs.length();i++) {
 				VendingMachine vm = gson.fromJson(rs.optJSONObject(i).toString(), VendingMachine.class);
@@ -64,7 +60,7 @@ public class VMDAOImpl implements VMDAO{
 
 		return vms;
 	}
-	
+
 	@Override
 	public VMReport fetchReportofVM() {
 		VMReport vmReport = new VMReport();
@@ -74,22 +70,21 @@ public class VMDAOImpl implements VMDAO{
 			if(!user.getRole().contains("admin")) {
 				return null;
 			}
-			
+
 			int total_vms=0;
 			int total_refillings=0;
 			double average_money_per_vm=0;
 			double total_money=0;
-			
-		 
+
+
 			//REPORT
-			String sql = "select count(id) as total_vms,sum(item_count) as total_items,sum(item_refilled) as total_refillings,"
-					+ "sum(money_collected) as total_money from vending_machine where status = ? ";
+			String sql = "select count(id) as total_vms,sum(itemcount) as total_items,sum(itemrefilled) as total_refillings,"
+					+ "sum(moneycollected) as total_money from vending_machine where status = ? ";
 
 			ArrayList<Object> arg = new ArrayList<Object>();
 			arg.add("active");
 
 			JSONArray rs = Utils.executeQueryWithConn(sql, arg);
-			System.out.println(rs);
 			if(rs.length() > 0) {
 				JSONObject obj = rs.optJSONObject(0);
 				total_vms = obj.optInt("total_vms");
@@ -97,7 +92,7 @@ public class VMDAOImpl implements VMDAO{
 				total_money = obj.optInt("total_money");
 				average_money_per_vm = total_money/total_vms;						
 			}
-			
+
 			//END CALCULATIONS			
 			ArrayList<VendingMachine> vms = getVM();
 			vmReport.setVmlist(vms);			
@@ -105,17 +100,16 @@ public class VMDAOImpl implements VMDAO{
 			vmReport.setTotal_money(total_money);			
 			vmReport.setTotal_refillings(total_refillings);			
 			vmReport.setTotal_vms(total_vms);			
-			
+
 		}catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
-		
+
 
 		return vmReport;
 	}
-	
-	
+
+
 	@Override
 	public ResponseModel addVM(VendingMachine vm) {
 
@@ -127,7 +121,7 @@ public class VMDAOImpl implements VMDAO{
 				res.setSuccess(false);
 				return res;
 			}
-			
+
 			if(vm == null || vm.getName().equalsIgnoreCase("")) {
 				res.setMessage("Provide proper Name for Vending Machine");
 				res.setSuccess(false);
@@ -142,14 +136,17 @@ public class VMDAOImpl implements VMDAO{
 			Map<String, Object> values = new HashMap<String,Object>();
 			values = gson.fromJson(vm.toJSON().toString(), Map.class);
 
-			JSONArray rs = Utils.insertwithConn("vending_machine", values);
-			if(rs!=null && rs.length() > 0) {
+			int rs = Utils.insertwithConn("vending_machine", values);
+			if(rs > 0) {
 				res.setMessage("Vending Machine Added Successfully");
-				//res.setData(vm.toJSON());
+				res.setSuccess(true);
+			}else {
+				res.setMessage("Faile to Add Vending Machine");
+				res.setSuccess(false);
 			}
 
 		}catch (Exception e) {
-			// TODO: handle exceptio
+			e.printStackTrace();
 			res.setMessage("Try again Later..");
 			res.setSuccess(false);
 		}
@@ -161,23 +158,21 @@ public class VMDAOImpl implements VMDAO{
 	@Override
 	public boolean checkVMExists(int vmid, VendingMachine vm) {
 		String sql = "select * from vending_machine where status = ? and lower(name) = lower(?)";
-		if(vmid > 0) {
-			sql += " and id <> ?";
-		}
 
 		ArrayList<Object> arg = new ArrayList<Object>();
 		arg.add("active");
 		arg.add(vm.getName());
-		arg.add(vmid);
-
+		
+		if(vmid > 0) {
+			sql += " and id <> ?";
+			arg.add(vmid);
+		}		
 		JSONArray rs = Utils.executeQueryWithConn(sql, arg);
 
 		if(rs.length() > 0) {
 			return true;
 		}
-
 		return false;
-
 	}
 
 	@Override
@@ -190,7 +185,7 @@ public class VMDAOImpl implements VMDAO{
 				res.setSuccess(false);
 				return res;
 			}
-			
+
 			if(vm == null || vm.getName().equalsIgnoreCase("")) {
 				res.setMessage("Provide proper Name for Vending Machine");
 				res.setSuccess(false);
@@ -227,7 +222,7 @@ public class VMDAOImpl implements VMDAO{
 			}
 
 		}catch (Exception e) {
-			// TODO: handle exceptio
+			e.printStackTrace();
 			res.setMessage("Try again Later..");
 			res.setSuccess(false);
 		}
@@ -237,15 +232,9 @@ public class VMDAOImpl implements VMDAO{
 
 	@Override
 	public VendingMachine getById(int vmid) {
-		
-		Authentication auth = authDetails.getAuthentication();
-		User user = userDAO.loadUserByUsername(auth.getName());	
-		if(!user.getRole().contains("admin")) {
-			return null;
-		}
-		
+
 		VendingMachine vm = new VendingMachine();
-		
+
 		String sql = "select * from vending_machine where status = ? and id = ?";
 
 		ArrayList<Object> arg = new ArrayList<Object>();
@@ -254,7 +243,6 @@ public class VMDAOImpl implements VMDAO{
 
 
 		JSONArray rs = Utils.executeQueryWithConn(sql, arg);
-		System.out.println(rs);
 		if(rs.length() > 0) {
 			if(vm != null) {
 				vm = gson.fromJson(rs.optJSONObject(0).toString(), VendingMachine.class);
@@ -300,7 +288,7 @@ public class VMDAOImpl implements VMDAO{
 			}
 
 		}catch (Exception e) {
-			// TODO: handle exceptio
+			e.printStackTrace();
 			res.setMessage("Try again Later..");
 			res.setSuccess(false);
 		}
@@ -309,9 +297,8 @@ public class VMDAOImpl implements VMDAO{
 	}
 
 	@Override
-	public ResponseModel vmRefill(int vmid,VMRefilOnly refill) {
+	public ResponseModel vmRefill(int vmid,VendingMachine refill) {
 		try {
-			System.out.println("A");
 			Authentication auth = authDetails.getAuthentication();
 			User user = userDAO.loadUserByUsername(auth.getName());	
 			if(user.getRole().contains("admin")) {
@@ -319,22 +306,20 @@ public class VMDAOImpl implements VMDAO{
 				res.setSuccess(false);
 				return res;
 			}
-			System.out.println("B"+refill.toJSON());
-			if(refill == null || refill.getItemRefilled() == 0) {
+			if(refill == null || refill.getItemRefilled()== 0) {
 				res.setMessage("Provide proper Refil Count for Vending Machine");
 				res.setSuccess(false);
 				return res;
 			}			
-			System.out.println("C");
 			VendingMachine singleoldVM = getById(vmid);
-			if(singleoldVM.getStatus() == null || (singleoldVM.getStatus() != null && singleoldVM.getStatus().equalsIgnoreCase("deleted"))) {
-				res.setMessage("Vending Machine Doesn't Exist");
+			if(singleoldVM == null || singleoldVM.getStatus() == null || (singleoldVM.getStatus() != null && singleoldVM.getStatus().equalsIgnoreCase("deleted"))) {
+				res.setMessage("Vending Machine Doesn't Exist/Don't have access");
 				res.setSuccess(false);				
 				return res;
 			}
-			System.out.println("D");
-			String sql = "update vending_machine set item_count= item_count+?,item_refilled= ?,money_collected= ?  where status = ? and id = ?";
+			String sql = "update vending_machine set itemcount= itemcount+?,itemrefilled= ?,moneycollected= ?  where status = ? and id = ?";
 			ArrayList<Object> arg = new ArrayList<Object>();
+			arg.add(refill.getItemRefilled());
 			arg.add(refill.getItemRefilled());
 			arg.add(refill.getMoneyCollected());
 			arg.add("active");
@@ -350,7 +335,7 @@ public class VMDAOImpl implements VMDAO{
 			}
 
 		}catch (Exception e) {
-			// TODO: handle exceptio
+			e.printStackTrace();
 			res.setMessage("Try again Later..");
 			res.setSuccess(false);
 		}
