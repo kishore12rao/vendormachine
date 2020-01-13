@@ -8,6 +8,12 @@ Vendor Machine
 5. Create a Database : vending_machine in mysql and  
 6. Load the backup using Dumpfile /vending_machine.sql - [mysql dir]/bin/mysql -u username -ppassword vending_machine < /vending_machine.sql
 
+RUN Application-com.jio.vm from IDE
+or
+
+mvn clean 
+mvn package in project root folder and run
+java -jar target/JioVendingMachine.jar from cmd/terminal
 
 
  

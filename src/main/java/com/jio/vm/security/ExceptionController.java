@@ -1,20 +1,16 @@
-package com.jio.vm.inventory;
+package com.jio.vm.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
  
 @RestController
-public class Inventory {
+public class ExceptionController{
  
-    @Autowired
-    //private InventoryService  customerService;
-  
-    @RequestMapping("/inventory") 
+    @RequestMapping("/*") 
     @ResponseBody
     public String welcome() {
-		return "Welcome to Inventory";    	
+		return "Welcome to Jio-Vending Machine, Please provide Valid API";    	
 
     }
 }
