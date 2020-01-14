@@ -66,6 +66,9 @@ public class VMDAOImpl implements VMDAO{
 		VMReport vmReport = new VMReport();
 		try {
 			Authentication auth = authDetails.getAuthentication();
+			if(auth == null || auth.getName() == null) {
+				return null;
+			}
 			User user = userDAO.loadUserByUsername(auth.getName());	
 			if(!user.getRole().contains("admin")) {
 				return null;
