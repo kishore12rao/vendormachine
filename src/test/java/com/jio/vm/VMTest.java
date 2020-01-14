@@ -123,6 +123,7 @@ public class VMTest extends ApplicationTest {
 		  .accept(MediaType.APPLICATION_JSON));
 	}
 	
+	
 	//SERVICE PERSON 
 	
 	@Test
