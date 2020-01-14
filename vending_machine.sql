@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 13, 2020 at 05:42 AM
+-- Generation Time: Jan 13, 2020 at 08:56 PM
 -- Server version: 5.05.01
 -- PHP Version: 5.6.28
 
@@ -23,17 +23,12 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `api_reports`
+-- Table structure for table `inventory`
 --
 
-CREATE TABLE `api_reports` (
+CREATE TABLE `inventory` (
   `id` bigint(20) UNSIGNED NOT NULL auto_increment,
-  `api` varchar(100) NOT NULL,
-  `success` tinyint(1) NOT NULL,
-  `failure` tinyint(1) NOT NULL,
-  `req_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `resp_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `latency` double NOT NULL
+  `products` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -70,9 +65,9 @@ CREATE TABLE `vending_machine` (
   `id` bigint(20) UNSIGNED NOT NULL auto_increment,
   `name` varchar(20) NOT NULL,
   `description` varchar(50) NOT NULL,
-  `item_count` int(11) NOT NULL DEFAULT '0',
-  `item_refilled` int(11) NOT NULL DEFAULT '0',
-  `money_collected` double NOT NULL DEFAULT '0',
+  `itemcount` int(11) NOT NULL DEFAULT '0',
+  `itemrefilled` int(11) NOT NULL DEFAULT '0',
+  `moneycollected` double NOT NULL DEFAULT '0',
   `status` varchar(20) NOT NULL DEFAULT 'active',
   `createdts` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Vending Machine';
@@ -82,9 +77,10 @@ CREATE TABLE `vending_machine` (
 --
 
 --
--- Indexes for table `api_reports`
+-- Indexes for table `inventory`
 --
-ALTER TABLE `api_reports`
+ALTER TABLE `inventory`
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `id` (`id`);
 
 --
